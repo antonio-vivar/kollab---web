@@ -3,7 +3,7 @@ node_modules/
 package-lock.json.bak
 
 # Base de datos local (SQLite) — contiene datos y hashes, NO subir
-kollab-app/kollab.db
+legacy-sqlite/kollab.db
 *.sqlite
 *.db
 *.db-shm
@@ -18,11 +18,12 @@ kollab-app/kollab.db
 *.log
 npm-debug.log*
 
-# Sistema operativo / editores
+# Sistema operativo / editores / herramientas locales
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
+.claude/
 
 # Build
 dist/
