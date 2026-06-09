@@ -1,0 +1,12 @@
+{
+  "name": "kollab-plataforma",
+  "version": "1.0.0",
+  "description": "Plataforma integrada de gestion del trabajo remoto e hibrido - Kollab",
+  "main": "server.js",
+  "scripts": { "start": "node --experimental-sqlite server.js" },
+  "dependencies": {
+    "express": "^4.19.2",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2"
+  }
+}

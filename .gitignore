@@ -1,0 +1,29 @@
+# Dependencias
+node_modules/
+package-lock.json.bak
+
+# Base de datos local (SQLite) — contiene datos y hashes, NO subir
+kollab-app/kollab.db
+*.sqlite
+*.db
+*.db-shm
+*.db-wal
+
+# Variables de entorno y secretos
+.env
+.env.local
+*.secret
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema operativo / editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Build
+dist/
+build/

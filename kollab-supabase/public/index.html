@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kollab — Plataforma de Gestión del Trabajo</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="config-warning" class="login-screen hidden">
+  <div class="login-box">
+    <div class="logo-mark big">!</div>
+    <h1>Falta configurar Supabase</h1>
+    <p class="login-sub">Abre <strong>public/config.js</strong> y pega la URL y la anon key de tu proyecto de Supabase. Luego recarga esta página.</p>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="login-screen" class="login-screen hidden">
+  <div class="login-box">
+    <div class="logo-mark big">K</div>
+    <h1>KOLLAB</h1>
+    <p class="login-sub">Plataforma integrada de gestión del trabajo</p>
+    <div class="field"><label>Email</label><input id="login-email" type="email" placeholder="admin@kollab.cl"></div>
+    <div class="field"><label>Contraseña</label><input id="login-pass" type="password"></div>
+    <button class="btn btn-primary btn-block" id="btn-login" onclick="doLogin()">Ingresar</button>
+    <div id="login-error" class="login-error"></div>
+    <div class="login-hint">
+      Ingresa con tu cuenta corporativa. Tu rol determina las funciones disponibles.
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="app hidden">
+  <header>
+    <div class="logo">
+      <div class="logo-mark">K</div>
+      <div><h1>KOLLAB<span>Gestión del Trabajo Remoto e Híbrido</span></h1></div>
+    </div>
+    <div class="header-actions">
+      <span id="user-chip" class="user-chip"></span>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Salir</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <div class="tab active" data-view="dashboard" onclick="switchTab('dashboard')">Dashboard</div>
+    <div class="tab" data-view="projects" onclick="switchTab('projects')">Proyectos</div>
+    <div class="tab" data-view="workload" onclick="switchTab('workload')">Carga del equipo</div>
+    <div class="tab" data-view="integrations" onclick="switchTab('integrations')">Integraciones</div>
+    <div class="tab" data-view="audit" onclick="switchTab('audit')">Auditoría</div>
+  </nav>
+
+  <main>
+    <section id="view-dashboard" class="view active">
+      <div class="section-head"><h2>Resumen General</h2></div>
+      <div class="kpis" id="kpis"></div>
+      <div class="section-head"><h2>Proyectos Activos</h2></div>
+      <div class="grid-projects" id="dash-projects"></div>
+    </section>
+    <section id="view-projects" class="view">
+      <div class="section-head">
+        <h2>Proyectos</h2>
+        <button class="btn btn-primary btn-sm" id="btn-new-project" onclick="openProjectModal()">+ Nuevo proyecto</button>
+      </div>
+      <div class="grid-projects" id="all-projects"></div>
+    </section>
+    <section id="view-workload" class="view">
+      <div class="section-head"><h2>Monitoreo de Carga Laboral</h2></div>
+      <div id="workload-list"></div>
+    </section>
+    <section id="view-integrations" class="view">
+      <div class="section-head"><h2>Integración con Herramientas</h2></div>
+      <div id="integrations-list"></div>
+    </section>
+    <section id="view-audit" class="view">
+      <div class="section-head"><h2>Bitácora de Auditoría</h2></div>
+      <div id="audit-list"></div>
+    </section>
+  </main>
+</div>
+
+<!-- PROJECT DETAIL MODAL -->
+<div class="modal-bg" id="detail-modal">
+  <div class="modal modal-lg">
+    <div class="modal-head">
+      <div>
+        <h3>Detalle del Proyecto</h3>
+        <div class="modal-subtitle" id="dm-title"></div>
+      </div>
+      <button class="x" onclick="closeModal('detail-modal')">✕</button>
+    </div>
+    <h4 class="comm-title" style="margin-top:4px;border-top:none;padding-top:0">Tareas</h4>
+    <div id="dm-tasks"></div>
+    <div class="add-task-row">
+      <input id="dm-task-title" type="text" placeholder="Nueva tarea...">
+      <select id="dm-task-assignee"></select>
+      <select id="dm-task-prio"><option value="alta">Alta</option><option value="media" selected>Media</option><option value="baja">Baja</option></select>
+      <button class="btn btn-primary btn-sm" onclick="addTask()">Agregar</button>
+    </div>
+    <h4 class="comm-title">Comunicación del proyecto</h4>
+    <div id="dm-comments" class="comments"></div>
+    <div class="add-comment-row">
+      <input id="dm-comment" type="text" placeholder="Escribe un mensaje trazable...">
+      <button class="btn btn-primary btn-sm" onclick="addComment()">Enviar</button>
+    </div>
+  </div>
+</div>
+
+<!-- NEW PROJECT MODAL -->
+<div class="modal-bg" id="project-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>Nuevo proyecto</h3><button class="x" onclick="closeModal('project-modal')">✕</button></div>
+    <div class="field"><label>Nombre</label><input id="pm-name" type="text"></div>
+    <div class="field"><label>Descripción</label><input id="pm-desc" type="text"></div>
+    <div class="field"><label>Fecha límite</label><input id="pm-deadline" type="date"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('project-modal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveProject()">Crear</button>
+    </div>
+  </div>
+</div>
+
+<!-- Supabase JS v2 + config + app -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
