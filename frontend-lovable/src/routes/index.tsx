@@ -5,6 +5,7 @@ import {
   Plus, X, Send, CheckCircle2, AlertTriangle, Clock, TrendingUp,
   MessageSquare, Trash2, Sparkles,
 } from "lucide-react";
+import { supabase, DEMO_CREDENTIALS } from "../lib/supabase";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -174,16 +175,36 @@ function WelcomeScreen() {
 
 /* ============================ LOGIN ============================ */
 function LoginScreen({ onLogin }: { onLogin: (u: User) => void }) {
-  const [email, setEmail] = useState("antonio@kollab.app");
-  const [password, setPassword] = useState("••••••••");
-  const [selectedId, setSelectedId] = useState<string>("u1");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  // Rellena las credenciales reales del rol elegido (acceso rápido para la demo)
+  const fillRole = (role: Role) => {
+    const c = DEMO_CREDENTIALS[role];
+    if (c) { setEmail(c.email); setPassword(c.password); setError(""); }
+  };
+
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     if (!email.includes("@") || password.length < 4) { setError("Verifica tu correo y contraseña."); return; }
-    const u = USERS.find(x => x.id === selectedId)!;
-    onLogin(u);
+    setLoading(true);
+    try {
+      const { data, error: authErr } = await supabase.auth.signInWithPassword({ email, password });
+      if (authErr || !data.user) { setError("Credenciales inválidas."); setLoading(false); return; }
+      // Obtener nombre y rol reales desde la tabla profiles (RBAC)
+      const { data: prof } = await supabase.from("profiles").select("name, role").eq("id", data.user.id).single();
+      const name = (prof?.name as string) || data.user.email || "Usuario";
+      const role = ((prof?.role as Role) || "colaborador");
+      const initials = name.split(" ").map(p => p[0]).slice(0, 2).join("").toUpperCase();
+      const color = role === "admin" ? "#00BCD4" : role === "gerente" ? "#26A69A" : "#1E88E5";
+      onLogin({ id: data.user.id, name, role, initials, color });
+    } catch {
+      setError("No se pudo iniciar sesión. Revisa tu conexión.");
+      setLoading(false);
+    }
   };
 
   return (
@@ -210,13 +231,11 @@ function LoginScreen({ onLogin }: { onLogin: (u: User) => void }) {
               className="w-full bg-[var(--input)] rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-[var(--ring)] border border-white/5" />
           </Field>
 
-          <Field label="Ingresar como (demostración de roles)">
+          <Field label="Acceso rápido (rellena las credenciales)">
             <div className="grid grid-cols-3 gap-2">
               {USERS.map(u => (
-                <button type="button" key={u.id} onClick={() => setSelectedId(u.id)}
-                  className={`rounded-lg px-2 py-2 text-xs border transition ${selectedId === u.id
-                    ? "border-[var(--ring)] bg-[rgba(38,166,154,0.15)]"
-                    : "border-white/10 bg-white/5 hover:bg-white/10"}`}>
+                <button type="button" key={u.id} onClick={() => fillRole(u.role)}
+                  className="rounded-lg px-2 py-2 text-xs border border-white/10 bg-white/5 hover:bg-white/10 transition">
                   <div className="font-semibold">{u.name.split(" ")[0]}</div>
                   <div className="text-[10px] capitalize text-muted-foreground">{u.role}</div>
                 </button>
@@ -226,10 +245,10 @@ function LoginScreen({ onLogin }: { onLogin: (u: User) => void }) {
 
           {error && <div className="text-sm text-[var(--color-danger)]">{error}</div>}
 
-          <button type="submit" className="btn-primary w-full rounded-lg py-2.5">Ingresar</button>
+          <button type="submit" disabled={loading} className="btn-primary w-full rounded-lg py-2.5 disabled:opacity-60">{loading ? "Ingresando…" : "Ingresar"}</button>
         </form>
         <p className="mt-4 text-[11px] text-muted-foreground text-center">
-          Esta es una vista de demostración. La validación es solo visual.
+          Inicia sesión con tu cuenta. Tu rol define lo que puedes ver y hacer.
         </p>
       </div>
     </div>
