@@ -8,7 +8,7 @@ Plataforma integrada que centraliza la **gestión de proyectos y tareas**, el **
 
 ```
 kollab---web/
-├── frontend/         # Capa de presentación: HTML5 + CSS3 + JavaScript (consume Supabase)
+├── frontend/         # Aplicación web (React + Vite + TypeScript + Tailwind) que consume Supabase
 ├── backend/          # Backend-as-code: schema.sql (tablas, RLS/RBAC, triggers y funciones)
 ├── legacy-sqlite/    # Implementación alternativa con Node/Express + SQLite (referencia)
 └── README.md
@@ -26,7 +26,7 @@ kollab---web/
                      backend/schema.sql ┘
 ```
 
-- **Frontend** (`frontend/`): aplicación web que consume Supabase mediante `supabase-js`.
+- **Frontend** (`frontend/`): aplicación web en React + Vite + TypeScript (diseño con Tailwind/shadcn-ui) que consume Supabase mediante `supabase-js`.
 - **Backend** (`backend/schema.sql`): definición declarativa de la base de datos, las políticas de seguridad por rol (Row Level Security) y los triggers. **No requiere servidor propio**: se ejecuta sobre Supabase/PostgreSQL gestionado en la nube.
 - **legacy-sqlite/**: versión autónoma con backend Express + SQLite, conservada como referencia.
 
@@ -34,7 +34,7 @@ kollab---web/
 
 | Capa | Tecnología |
 |------|-----------|
-| Frontend | HTML5 + CSS3 + JavaScript |
+| Frontend | React + Vite + TypeScript + Tailwind (shadcn/ui) |
 | Base de datos | Supabase (PostgreSQL) |
 | Autenticación | Supabase Auth (email + contraseña) |
 | Autorización | Row Level Security (RLS) por rol |
@@ -52,10 +52,16 @@ kollab---web/
 1. Crear un proyecto en [supabase.com](https://supabase.com).
 2. En **SQL Editor**, ejecutar el contenido de `backend/schema.sql`.
 3. Crear usuarios en **Authentication → Users** y asignar su `role` en la tabla `profiles`.
-4. Copiar la **Project URL** y la **publishable key** en `frontend/config.js`.
-5. Servir la carpeta `frontend/` (por ejemplo: `python -m http.server 8090`) y abrir `http://localhost:8090`.
+4. La conexión a Supabase ya está configurada en `frontend/src/lib/supabase.ts` (Project URL + publishable key).
+5. Instalar dependencias y ejecutar el frontend:
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+   Abrir `http://localhost:8080`.
 
-Más detalle de configuración en [`backend/README.md`](backend/README.md).
+Más detalle de configuración del backend en [`backend/README.md`](backend/README.md).
 
 ## 🌿 Ramas
 
