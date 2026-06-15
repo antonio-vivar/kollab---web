@@ -5,7 +5,8 @@ import {
   Plus, X, Send, CheckCircle2, AlertTriangle, Clock, TrendingUp,
   MessageSquare, Trash2, Sparkles,
 } from "lucide-react";
-import { supabase, DEMO_CREDENTIALS } from "../lib/supabase";
+import { signInLocal, DEMO_CREDENTIALS } from "../lib/auth";
+import { usePersistentState } from "../lib/storage";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -178,33 +179,20 @@ function LoginScreen({ onLogin }: { onLogin: (u: User) => void }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  // Rellena las credenciales reales del rol elegido (acceso rápido para la demo)
+  // Rellena las credenciales del rol elegido (acceso rápido para la demo)
   const fillRole = (role: Role) => {
     const c = DEMO_CREDENTIALS[role];
     if (c) { setEmail(c.email); setPassword(c.password); setError(""); }
   };
 
-  const submit = async (e: React.FormEvent) => {
+  const submit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     if (!email.includes("@") || password.length < 4) { setError("Verifica tu correo y contraseña."); return; }
-    setLoading(true);
-    try {
-      const { data, error: authErr } = await supabase.auth.signInWithPassword({ email, password });
-      if (authErr || !data.user) { setError("Credenciales inválidas."); setLoading(false); return; }
-      // Obtener nombre y rol reales desde la tabla profiles (RBAC)
-      const { data: prof } = await supabase.from("profiles").select("name, role").eq("id", data.user.id).single();
-      const name = (prof?.name as string) || data.user.email || "Usuario";
-      const role = ((prof?.role as Role) || "colaborador");
-      const initials = name.split(" ").map(p => p[0]).slice(0, 2).join("").toUpperCase();
-      const color = role === "admin" ? "#00BCD4" : role === "gerente" ? "#26A69A" : "#1E88E5";
-      onLogin({ id: data.user.id, name, role, initials, color });
-    } catch {
-      setError("No se pudo iniciar sesión. Revisa tu conexión.");
-      setLoading(false);
-    }
+    const user = signInLocal(email, password);
+    if (!user) { setError("Credenciales inválidas."); return; }
+    onLogin(user);
   };
 
   return (
@@ -245,7 +233,7 @@ function LoginScreen({ onLogin }: { onLogin: (u: User) => void }) {
 
           {error && <div className="text-sm text-[var(--color-danger)]">{error}</div>}
 
-          <button type="submit" disabled={loading} className="btn-primary w-full rounded-lg py-2.5 disabled:opacity-60">{loading ? "Ingresando…" : "Ingresar"}</button>
+          <button type="submit" className="btn-primary w-full rounded-lg py-2.5">Ingresar</button>
         </form>
         <p className="mt-4 text-[11px] text-muted-foreground text-center">
           Inicia sesión con tu cuenta. Tu rol define lo que puedes ver y hacer.
@@ -269,9 +257,9 @@ type Tab = "dashboard" | "proyectos" | "carga" | "integraciones" | "auditoria";
 
 function MainApp({ user, onLogout }: { user: User; onLogout: () => void }) {
   const [tab, setTab] = useState<Tab>("dashboard");
-  const [projects, setProjects] = useState<Project[]>(INITIAL_PROJECTS);
-  const [audit, setAudit] = useState<AuditEntry[]>(INITIAL_AUDIT);
-  const [integrations, setIntegrations] = useState<Integration[]>(INITIAL_INTEGRATIONS);
+  const [projects, setProjects] = usePersistentState<Project[]>("projects", INITIAL_PROJECTS);
+  const [audit, setAudit] = usePersistentState<AuditEntry[]>("audit", INITIAL_AUDIT);
+  const [integrations, setIntegrations] = usePersistentState<Integration[]>("integrations", INITIAL_INTEGRATIONS);
   const [detailId, setDetailId] = useState<string | null>(null);
   const [showNewProject, setShowNewProject] = useState(false);
 
