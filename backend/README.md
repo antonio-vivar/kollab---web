@@ -1,102 +1,54 @@
-# Kollab — Plataforma Integrada de Gestión del Trabajo (Supabase)
+# Kollab — Diseño de base de datos (fase de producción)
 
-MVP funcional del proyecto **Kollab** (GPY1101). Resuelve la fragmentación operativa
-centralizando proyectos, tareas, carga laboral, comunicación trazable e integraciones
-en una sola plataforma, sobre una base de datos en la nube.
+> ⚠️ **Este backend NO está conectado al MVP que corre hoy.** El MVP actual
+> (carpeta `frontend/`) funciona 100% en el navegador, sin servidor ni base
+> de datos: usa un login local contra credenciales fijas (`frontend/src/lib/auth.ts`)
+> y guarda los datos en `localStorage` (`frontend/src/lib/storage.ts`). Este
+> documento describe el diseño de la base de datos pensado para la **siguiente
+> fase**, cuando se implemente la plataforma SaaS real (Opción A del informe EP3).
 
-## Tecnologías (coherentes con el informe)
+## Por qué existe este archivo si no está conectado
 
-| Capa | Tecnología | Requerimiento que cubre |
-|------|-----------|--------------------------|
-| Frontend | HTML5 + CSS3 + JavaScript (Vanilla) | UI, declarado en el MVP del informe |
-| Base de datos | **Supabase (PostgreSQL en la nube)** | Fuente única de verdad, escalabilidad (RNF-05) |
-| Autenticación | **Supabase Auth** (email + contraseña, soporta MFA) | Seguridad, MFA (RNF-03) |
-| Autorización | **Row Level Security (RLS)** por rol | RBAC (RNF-03) |
-| Transporte | HTTPS / TLS (provisto por Supabase) | Cifrado TLS 1.3 (RNF-03) |
+El informe EP3 recomienda adquirir e integrar una plataforma SaaS (Monday,
+ClickUp, Jira, etc.), no construir un backend propio. `schema.sql` no es el
+backend de producción de Kollab — es una **prueba de diseño**: muestra cómo
+se implementaría el control de acceso por rol (RBAC) a nivel de base de
+datos con Supabase/PostgreSQL, en caso de que se necesite una capa propia de
+datos (por ejemplo, para almacenar métricas internas que el SaaS contratado
+no cubra). Se mantiene en el repositorio como evidencia técnica de que el
+equipo diseñó también esa alternativa, no como parte del MVP que se demuestra
+en la defensa oral.
 
-## Puesta en marcha (paso a paso)
+## Qué contiene `schema.sql`
 
-### 1. Crear el proyecto en Supabase
-1. Entra a https://supabase.com y crea un proyecto nuevo (plan gratuito sirve).
-2. Espera a que termine de aprovisionarse (1–2 minutos).
+| Elemento | Para qué sirve |
+|---|---|
+| Tablas `profiles`, `projects`, `tasks`, `comments`, `audit_log`, `integrations` | Modelo de datos equivalente al que usa el MVP, pero en una base real |
+| Función `current_role_kollab()` | Devuelve el rol del usuario autenticado, para usarlo en las políticas de seguridad |
+| Trigger `on_auth_user_created` | Crea automáticamente el perfil (con rol `colaborador` por defecto) al registrar un usuario nuevo |
+| Políticas de **Row Level Security (RLS)** | Implementan el RBAC directamente en la base de datos: cada tabla define qué rol puede leer, crear, editar o eliminar cada fila |
 
-### 2. Crear la base de datos
-1. En el menú lateral, abre **SQL Editor**.
-2. Abre el archivo `schema.sql` de este proyecto, copia TODO su contenido y pégalo.
-3. Presiona **Run**. Se crearán las tablas, las políticas RLS (RBAC) y los datos de ejemplo.
+## Cómo probarlo (opcional, fuera del alcance del MVP actual)
 
-### 3. Crear los usuarios (Auth)
-En el menú lateral, abre **Authentication > Users > Add user** y crea, por ejemplo:
+Si se quisiera levantar esta base de datos solo para comprobar que el
+diseño funciona (no es necesario para la defensa, que usa el MVP local):
 
-| Email | Contraseña | Rol que tendrá |
-|-------|-----------|----------------|
-| admin@kollab.cl | (la que elijas) | admin |
-| ceo@kollab.cl | (la que elijas) | gerente |
-| colaborador@kollab.cl | (la que elijas) | colaborador |
-
-> Marca la opción **Auto Confirm User** al crearlos para poder entrar de inmediato.
-
-Al crear cada usuario, un *trigger* crea automáticamente su fila en la tabla `profiles`
-con rol `colaborador`. Para asignar los roles `admin` y `gerente`:
-1. Abre **Table Editor > profiles**.
-2. Edita el campo `role` de cada usuario (admin / gerente / colaborador).
-3. (Opcional) edita también el campo `name` para que muestre el nombre real.
-
-### 4. Conectar el frontend
-1. En Supabase abre **Project Settings > API** (o **Data API**).
-2. Copia **Project URL** y la clave **anon public**.
-3. Abre `public/config.js` y reemplaza los valores:
-   ```js
-   window.KOLLAB_CONFIG = {
-     SUPABASE_URL: "https://tuproyecto.supabase.co",
-     SUPABASE_ANON_KEY: "eyJhbGc..."
-   };
-   ```
-
-### 5. Ejecutar la aplicación
-El frontend es estático. Cualquiera de estas opciones funciona:
-- Doble clic en `public/index.html`, **o**
-- Servirlo localmente (recomendado):
-  ```bash
-  cd kollab-supabase/public
-  python -m http.server 5500
-  # abre http://localhost:5500
-  ```
-Inicia sesión con uno de los usuarios creados en el paso 3.
+1. Crear un proyecto gratuito en [supabase.com](https://supabase.com).
+2. Abrir **SQL Editor**, pegar todo el contenido de `schema.sql` y ejecutar.
+3. En **Authentication → Users**, crear 3 usuarios de prueba y, en
+   **Table Editor → profiles**, asignarles los roles `admin`, `gerente` y
+   `colaborador` respectivamente.
+4. Verificar en **Table Editor** que, por ejemplo, un usuario con rol
+   `colaborador` no puede insertar filas en `projects` ni leer `audit_log`
+   (las políticas RLS deben rechazarlo).
 
 ## Mapeo a los requerimientos del proyecto
 
-| Requerimiento | Cómo se resuelve | Dónde verlo |
-|---------------|------------------|-------------|
-| **RF-01** Gestión de proyectos y tareas | Tablas `projects` y `tasks`; avance calculado automáticamente | Dashboard / Proyectos |
-| **RF-02** Monitoreo de carga laboral | Carga por persona ponderada por prioridad, con alerta de sobrecarga | Pestaña Carga del equipo |
-| **RF-03** Paneles de KPIs | Métricas en tiempo real (avance global, en riesgo, tareas pendientes) | Dashboard |
-| **RF-04** Comunicación estructurada y trazable | Tabla `comments` por proyecto + `audit_log` de cada acción | Detalle de proyecto + pestaña Auditoría |
-| **RF-05** Integración con herramientas | Tabla `integrations` (Slack, Drive, Zoom, Jira, Trello) con estado | Pestaña Integraciones |
-| **RNF-03** Seguridad | Supabase Auth (contraseñas hasheadas + MFA), RLS para RBAC, TLS | Login + políticas RLS en `schema.sql` |
-| **RNF-05** Escalabilidad | PostgreSQL gestionado por Supabase | Infraestructura cloud |
-
-## Cómo se evidencia el RBAC (para la defensa)
-- Inicia sesión como **colaborador**: NO verá el botón "Nuevo proyecto" ni la pestaña "Auditoría",
-  y si intentara crear un proyecto, las políticas RLS de la base de datos lo rechazan.
-- Inicia sesión como **admin/gerente**: puede crear/eliminar proyectos y ver la auditoría.
-  El control no está solo en la interfaz: está **en la base de datos** (RLS), que es la forma correcta.
-
-## Alcance del MVP vs. producción
-Implementado: autenticación real, RBAC por RLS, proyectos, tareas, carga, KPIs, comentarios,
-auditoría e integraciones (registro y estado), todo sobre PostgreSQL en la nube.
-Fuera de alcance (despliegue productivo): activación de MFA por usuario, sincronización
-bidireccional efectiva con las APIs reales de cada herramienta y notificaciones en tiempo real.
-Supabase ya provee la base para todo ello (Auth con MFA, Realtime y Edge Functions).
-
-## Estructura
-```
-kollab-supabase/
-├── schema.sql              # base de datos completa (pegar en Supabase SQL Editor)
-├── README.md
-└── public/
-    ├── index.html
-    ├── styles.css
-    ├── config.js           # <-- pega aquí tu URL y anon key
-    └── app.js              # cliente conectado a Supabase
-```
+| Requerimiento | Cómo lo resolvería esta base de datos | Cómo lo resuelve el MVP actual |
+|---|---|---|
+| RF-01 Proyectos y tareas | Tablas `projects` / `tasks` | Arreglos en memoria, persistidos en `localStorage` |
+| RF-02 Carga laboral | (no modelada aún; se calcularía desde `tasks`) | Datos fijos de ejemplo en `index.tsx` |
+| RF-03 KPIs | Se calcularían con consultas sobre `projects`/`tasks` | Calculados en el cliente a partir del estado local |
+| RF-04 Comunicación trazable | Tablas `comments` y `audit_log` | Arreglos locales `comments` / `audit` |
+| RF-05 Integraciones | Tabla `integrations` | Arreglo local con vista previa simulada |
+| RNF-03 Seguridad | RLS por rol, a nivel de base de datos | Solo a nivel de interfaz (oculta botones/pestañas según rol) |

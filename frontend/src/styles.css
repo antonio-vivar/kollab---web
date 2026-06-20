@@ -1,15 +1,32 @@
+/* Importa Tailwind CSS v4 y le indica que escanee la carpeta "src" para
+   generar solo las clases utilitarias que realmente se usan en el código. */
 @import "tailwindcss" source(none);
 @source "../src";
+/* Librería de animaciones listas para usar junto con Tailwind. */
 @import "tw-animate-css";
 
+/* Define la variante "dark" para poder escribir, por ejemplo, dark:bg-black
+   en cualquier elemento, activándose cuando un ancestro tiene la clase .dark */
 @custom-variant dark (&:is(.dark *));
 
+/* ============================================================
+   TOKENS DE DISEÑO (@theme)
+   Aquí se "traducen" las variables CSS de :root (definidas más abajo)
+   en utilidades de Tailwind. Por ejemplo, --color-primary permite usar
+   bg-primary, text-primary, border-primary, etc. en cualquier componente.
+   ============================================================ */
 @theme inline {
+  /* Radios de borde derivados de un único valor base (--radius),
+     así basta cambiar uno para escalar todos los redondeos del sistema. */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --radius-2xl: calc(var(--radius) + 8px);
+
+  /* Colores semánticos (no literales): cada nombre describe su USO
+     ("primary", "destructive", "muted"), no el color en sí. Esto permite
+     cambiar la paleta completa más adelante sin tocar los componentes. */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -29,6 +46,9 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  /* Colores propios de la marca Kollab (no son parte del set estándar
+     de shadcn/ui), usados en los degradados de botones y el logo. */
   --color-teal: var(--teal);
   --color-teal-light: var(--teal-light);
   --color-cyan: var(--cyan);
@@ -38,55 +58,96 @@
   --color-danger: var(--danger);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
+
+  /* Tipografía global: Inter, con fallback a las fuentes del sistema. */
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
+/* ============================================================
+   PALETA DE COLORES — MODO OSCURO (único tema de la app)
+   Estos son los valores reales en hexadecimal/rgba que las variables
+   de arriba van a usar. Cambiar un valor aquí actualiza toda la app.
+   ============================================================ */
 :root {
-  --radius: 0.875rem;
+  --radius: 0.875rem; /* radio base de las esquinas redondeadas (≈14px) */
+
+  /* Fondo general y superficies (paneles, tarjetas) */
   --background: #0A0F14;
   --foreground: #FFFFFF;
   --surface: #0D1B2A;
   --surface-2: #1B2B3A;
+
+  /* Tarjetas / popovers: usan transparencia para el efecto "glass" */
   --card: rgba(27, 43, 58, 0.55);
   --card-foreground: #FFFFFF;
   --popover: #0D1B2A;
   --popover-foreground: #FFFFFF;
+
+  /* Color principal de marca: cian (usado en botones, links, acentos) */
   --primary: #00BCD4;
   --primary-foreground: #062028;
+
+  /* Elementos secundarios y "muted" (textos de menor jerarquía) */
   --secondary: rgba(255, 255, 255, 0.06);
   --secondary-foreground: #FFFFFF;
   --muted: rgba(255, 255, 255, 0.05);
   --muted-foreground: #90A4AE;
+
+  /* Acento (verde-teal) y estado destructivo (rojo, para eliminar/errores) */
   --accent: #26A69A;
   --accent-foreground: #FFFFFF;
   --destructive: #E53935;
   --destructive-foreground: #FFFFFF;
+
+  /* Bordes, inputs y anillo de foco */
   --border: rgba(255, 255, 255, 0.08);
   --input: rgba(255, 255, 255, 0.06);
   --ring: #26A69A;
+
+  /* Colores de marca específicos de Kollab, usados en degradados */
   --teal: #00897B;
   --teal-light: #26A69A;
   --cyan: #00BCD4;
+
+  /* Colores de estado (info, éxito, advertencia, peligro) usados en
+     badges de prioridad/estado y alertas de carga laboral */
   --info: #1E88E5;
   --success: #43A047;
   --warning: #FFB300;
   --danger: #E53935;
 }
 
+/* ============================================================
+   ESTILOS BASE GLOBALES
+   ============================================================ */
 @layer base {
+  /* Todos los elementos usan el color de borde definido arriba por defecto */
   * { border-color: var(--color-border); }
+
   html, body { background-color: var(--color-background); color: var(--color-foreground); }
+
   body {
     font-family: var(--font-sans);
+    /* Tres degradados radiales superpuestos (cian, verde-teal, azul) que
+       crean el efecto de "luz ambiental" de fondo en toda la app, sin
+       necesidad de imágenes ni capas adicionales en el HTML. */
     background-image:
       radial-gradient(1200px 600px at 10% -10%, rgba(0, 188, 212, 0.10), transparent 60%),
       radial-gradient(900px 500px at 100% 0%, rgba(38, 166, 154, 0.10), transparent 60%),
       radial-gradient(800px 600px at 50% 100%, rgba(30, 136, 229, 0.06), transparent 60%);
-    background-attachment: fixed;
+    background-attachment: fixed; /* el fondo no se mueve al hacer scroll */
     min-height: 100vh;
   }
 }
 
+/* ============================================================
+   UTILIDADES PERSONALIZADAS (@utility)
+   Cada una se puede usar como una clase normal de Tailwind, por ejemplo
+   className="glass" o className="btn-primary".
+   ============================================================ */
+
+/* Efecto "vidrio esmerilado" (glassmorphism) para tarjetas y paneles:
+   fondo semitransparente + blur + sombra suave + borde sutil. */
 @utility glass {
   background: linear-gradient(180deg, rgba(27, 43, 58, 0.65), rgba(13, 27, 42, 0.55));
   backdrop-filter: blur(14px) saturate(140%);
@@ -94,6 +155,8 @@
   box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255,255,255,0.04);
 }
 
+/* Versión más opaca/intensa del efecto "glass", usada en modales y el
+   formulario de login, donde se necesita más contraste con el fondo. */
 @utility glass-strong {
   background: linear-gradient(180deg, rgba(27, 43, 58, 0.85), rgba(13, 27, 42, 0.8));
   backdrop-filter: blur(20px) saturate(150%);
@@ -101,6 +164,8 @@
   box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.65);
 }
 
+/* Botón principal (acción positiva: "Ingresar", "Crear", "Agregar", etc.)
+   con degradado de marca verde-teal a cian. */
 @utility btn-primary {
   background: linear-gradient(135deg, #26A69A, #00BCD4);
   color: #04222a;
@@ -108,9 +173,10 @@
   box-shadow: 0 8px 24px -10px rgba(0, 188, 212, 0.55);
   transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
   &:hover { filter: brightness(1.06); box-shadow: 0 12px 28px -10px rgba(0, 188, 212, 0.7); }
-  &:active { transform: translateY(1px); }
+  &:active { transform: translateY(1px); } /* pequeño "hundimiento" al hacer clic */
 }
 
+/* Botón secundario/neutro (acciones como "Cancelar", "Salir", "Ver vista previa") */
 @utility btn-ghost {
   background: rgba(255,255,255,0.04);
   color: #FFFFFF;
@@ -119,6 +185,7 @@
   &:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.18); }
 }
 
+/* Botón de acción destructiva (ej. "Desconectar" una integración) */
 @utility btn-danger {
   background: rgba(229, 57, 53, 0.15);
   color: #ff8d8a;
@@ -126,8 +193,16 @@
   &:hover { background: rgba(229, 57, 53, 0.25); }
 }
 
+/* ============================================================
+   ANIMACIONES
+   ============================================================ */
+
+/* Aparece desde abajo con fade (usada al cambiar de pestaña y en el login) */
 @keyframes kollab-fade-up { from { opacity: 0; transform: translateY(8px);} to {opacity:1; transform:none;} }
+/* Aparece "creciendo" levemente desde el centro (usada en modales y el logo de bienvenida) */
 @keyframes kollab-scale-in { from { opacity: 0; transform: scale(.96);} to {opacity:1; transform: scale(1);} }
+/* Efecto de brillo que se desliza de izquierda a derecha (usado en la
+   barrita decorativa de la pantalla de bienvenida) */
 @keyframes kollab-shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
 @utility anim-fade-up { animation: kollab-fade-up .35s ease-out both; }
