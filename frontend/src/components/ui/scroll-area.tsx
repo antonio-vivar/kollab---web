@@ -3,6 +3,10 @@ import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 
 import { cn } from "@/lib/utils";
 
+// Contenedor con scroll personalizado (barra de desplazamiento delgada
+// y estilizada) en vez de la barra nativa del navegador. El detalle de tu
+// proyecto en Kollab usa overflow-y-auto nativo, no este componente —
+// esta es la alternativa más elaborada que ofrece la librería.
 const ScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
@@ -21,6 +25,9 @@ const ScrollArea = React.forwardRef<
 ));
 ScrollArea.displayName = ScrollAreaPrimitive.Root.displayName;
 
+// La barra de scroll en sí (vertical u horizontal). Se renderiza
+// siempre, pero Radix la hace visible solo cuando el contenido realmente
+// se desborda del contenedor.
 const ScrollBar = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>,
   React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>

@@ -8,6 +8,11 @@ import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
+// Paleta de comandos con búsqueda (como el "Ctrl+K" de muchas apps):
+// una caja de texto que filtra una lista de acciones en tiempo real.
+// Construida sobre la librería "cmdk"; las clases con prefijo
+// "[&_[cmdk-...]]" apuntan a elementos internos que esa librería
+// genera, no a hijos directos de React.
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive>
@@ -23,6 +28,8 @@ const Command = React.forwardRef<
 ));
 Command.displayName = CommandPrimitive.displayName;
 
+// Versión que se abre dentro de un modal (Dialog), para usarla como
+// buscador global activado por un atajo de teclado.
 const CommandDialog = ({ children, ...props }: DialogProps) => {
   return (
     <Dialog {...props}>
@@ -67,6 +74,7 @@ const CommandList = React.forwardRef<
 
 CommandList.displayName = CommandPrimitive.List.displayName;
 
+// Mensaje que se muestra cuando la búsqueda no coincide con ningún item.
 const CommandEmpty = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Empty>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Empty>
@@ -120,6 +128,8 @@ const CommandItem = React.forwardRef<
 
 CommandItem.displayName = CommandPrimitive.Item.displayName;
 
+// Texto pequeño a la derecha de un item, normalmente para mostrar el
+// atajo de teclado asociado (ej. "⌘K").
 const CommandShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => {
   return (
     <span

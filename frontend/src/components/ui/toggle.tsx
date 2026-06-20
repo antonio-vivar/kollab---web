@@ -4,6 +4,10 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
+// Botón de dos estados (presionado/no presionado), como un interruptor
+// pero con apariencia de botón. "toggleVariants" se exporta porque
+// ToggleGroup (el archivo siguiente) lo reutiliza para que cada item del
+// grupo comparta exactamente el mismo estilo que un Toggle individual.
 const toggleVariants = cva(
   "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium cursor-pointer transition-colors hover:bg-muted hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed data-[state=on]:bg-accent data-[state=on]:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {

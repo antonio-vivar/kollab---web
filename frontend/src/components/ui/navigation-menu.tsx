@@ -5,6 +5,10 @@ import { ChevronDown } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
+// Menú de navegación horizontal con submenús desplegables (típico de un
+// sitio de marketing, con secciones como "Productos ▾"). La navegación
+// real de Kollab (en MainApp) es más simple: botones de pestaña sin
+// submenús, escritos a mano en routes/index.tsx.
 const NavigationMenu = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Root>
@@ -34,6 +38,9 @@ NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName;
 
 const NavigationMenuItem = NavigationMenuPrimitive.Item;
 
+// Estilo del botón que abre cada submenú; se exporta por separado para
+// poder aplicarlo también a un <NavigationMenuLink> que no abre nada
+// (un ítem simple sin submenú), y que aun así se vea igual.
 const navigationMenuTriggerStyle = cva(
   "group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium cursor-pointer transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed data-[state=open]:text-accent-foreground data-[state=open]:bg-accent/50 data-[state=open]:hover:bg-accent data-[state=open]:focus:bg-accent",
 );
@@ -73,6 +80,9 @@ NavigationMenuContent.displayName = NavigationMenuPrimitive.Content.displayName;
 
 const NavigationMenuLink = NavigationMenuPrimitive.Link;
 
+// Contenedor que aloja el contenido del submenú actualmente abierto.
+// Se posiciona automáticamente debajo del trigger correspondiente y
+// ajusta su tamaño según las variables CSS que expone Radix.
 const NavigationMenuViewport = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Viewport>,
   React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Viewport>
@@ -90,6 +100,8 @@ const NavigationMenuViewport = React.forwardRef<
 ));
 NavigationMenuViewport.displayName = NavigationMenuPrimitive.Viewport.displayName;
 
+// Pequeño triángulo que apunta hacia el submenú abierto, indicando
+// visualmente de qué botón salió ese contenido.
 const NavigationMenuIndicator = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Indicator>,
   React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Indicator>

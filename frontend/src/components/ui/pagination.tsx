@@ -4,6 +4,9 @@ import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ButtonProps, buttonVariants } from "@/components/ui/button";
 
+// Controles de "página anterior / siguiente / número de página", para
+// listas largas divididas en páginas. No se usa en Kollab actualmente
+// (los listados de proyectos no están paginados), pero queda disponible.
 const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
   <nav
     role="navigation"
@@ -27,10 +30,13 @@ const PaginationItem = React.forwardRef<HTMLLIElement, React.ComponentProps<"li"
 PaginationItem.displayName = "PaginationItem";
 
 type PaginationLinkProps = {
-  isActive?: boolean;
+  isActive?: boolean; // resalta visualmente la página actual
 } & Pick<ButtonProps, "size"> &
   React.ComponentProps<"a">;
 
+// Cada número de página se ve como un botón (reutiliza buttonVariants),
+// pero técnicamente es un enlace <a>, para que la paginación funcione
+// también sin JavaScript (cada página tendría su propia URL).
 const PaginationLink = ({ className, isActive, size = "icon", ...props }: PaginationLinkProps) => (
   <a
     aria-current={isActive ? "page" : undefined}
@@ -75,6 +81,8 @@ const PaginationNext = ({ className, ...props }: React.ComponentProps<typeof Pag
 );
 PaginationNext.displayName = "PaginationNext";
 
+// "..." que reemplaza páginas intermedias cuando hay demasiadas para
+// mostrarlas todas (ej. "1 2 ... 8 9 10").
 const PaginationEllipsis = ({ className, ...props }: React.ComponentProps<"span">) => (
   <span
     aria-hidden

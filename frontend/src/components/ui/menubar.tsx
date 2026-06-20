@@ -4,6 +4,10 @@ import { Check, ChevronRight, Circle } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
+// Barra de menús estilo aplicación de escritorio (ej. "Archivo  Editar
+// Ver", cada uno con su propio desplegable). No se usa en Kollab; la
+// topbar real de la app es la definida en MainApp (routes/index.tsx).
+
 function MenubarMenu({ ...props }: React.ComponentProps<typeof MenubarPrimitive.Menu>) {
   return <MenubarPrimitive.Menu {...props} />;
 }

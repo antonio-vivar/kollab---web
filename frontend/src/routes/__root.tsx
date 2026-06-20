@@ -12,6 +12,8 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
+// Pantalla que se muestra cuando la URL no corresponde a ninguna ruta
+// definida (en este proyecto, cualquier dirección distinta de "/").
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -34,9 +36,16 @@ function NotFoundComponent() {
   );
 }
 
+// Pantalla de respaldo que TanStack Router muestra automáticamente si
+// algún componente de una ruta lanza un error durante el renderizado.
+// Es la "red de seguridad" para que, ante un bug, el usuario vea un
+// mensaje claro con la opción de reintentar, en vez de una pantalla en
+// blanco o un error crudo del navegador.
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
+  // Reporta el error a Lovable (la herramienta usada para el diseño
+  // inicial de la interfaz) para fines de monitoreo durante el desarrollo.
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
@@ -53,7 +62,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
             onClick={() => {
-              router.invalidate();
+              router.invalidate(); // descarta el cache del router e intenta cargar la ruta de nuevo
               reset();
             }}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
@@ -72,6 +81,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+// Ruta raíz de la aplicación: es el "molde" (layout) en el que se monta
+// cualquier otra ruta. Aquí se define el <head> del HTML (título,
+// metadatos para redes sociales, fuentes), y se conectan los componentes
+// de error/404 definidos arriba.
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
@@ -80,6 +93,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Kollab — Gestión del Trabajo Remoto e Híbrido" },
       { name: "description", content: "Plataforma colaborativa para gestionar proyectos, equipos y herramientas en entornos remotos e híbridos." },
       { name: "author", content: "Kollab" },
+      // Metadatos Open Graph / Twitter: controlan cómo se ve la vista
+      // previa del sitio al compartirlo en redes sociales o chats.
       { property: "og:title", content: "Kollab — Gestión del Trabajo Remoto e Híbrido" },
       { property: "og:description", content: "Plataforma colaborativa para gestionar proyectos, equipos y herramientas en entornos remotos e híbridos." },
       { property: "og:type", content: "website" },
@@ -87,6 +102,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@Kollab" },
     ],
     links: [
+      // Precarga las conexiones a Google Fonts para que la tipografía
+      // Inter cargue más rápido, y enlaza la hoja de estilos compilada
+      // (styles.css) mediante el sufijo "?url" de Vite.
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" },
@@ -99,6 +117,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
+// Estructura HTML más externa (<html><head><body>): se usa solo en el
+// render del servidor (SSR), para envolver toda la página la primera vez.
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
@@ -113,6 +133,9 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+// Componente que realmente se monta dentro del <body>. Provee el
+// QueryClient (compartido por toda la app) y renderiza, mediante
+// <Outlet />, la ruta hija que corresponda según la URL actual.
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 

@@ -3,11 +3,14 @@ import * as PopoverPrimitive from "@radix-ui/react-popover";
 
 import { cn } from "@/lib/utils";
 
+// Panel flotante que se abre al hacer clic (a diferencia del Tooltip,
+// que se abre al pasar el mouse). Útil para menús contextuales pequeños
+// o formularios cortos anclados a un botón.
 const Popover = PopoverPrimitive.Root;
 
 const PopoverTrigger = PopoverPrimitive.Trigger;
 
-const PopoverAnchor = PopoverPrimitive.Anchor;
+const PopoverAnchor = PopoverPrimitive.Anchor; // permite anclar el panel a un elemento distinto del trigger
 
 const PopoverContent = React.forwardRef<
   React.ElementRef<typeof PopoverPrimitive.Content>,

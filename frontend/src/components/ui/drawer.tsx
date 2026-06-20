@@ -3,8 +3,12 @@ import { Drawer as DrawerPrimitive } from "vaul";
 
 import { cn } from "@/lib/utils";
 
+// Panel que sube desde abajo (estilo "hoja de acción" de apps móviles),
+// construido sobre la librería "vaul" en vez de Radix UI. La barrita
+// gris pequeña dentro de DrawerContent es solo decorativa, indica al
+// usuario que puede arrastrar el panel para cerrarlo.
 const Drawer = ({
-  shouldScaleBackground = true,
+  shouldScaleBackground = true, // efecto de "achicar" el fondo al abrir el panel
   ...props
 }: React.ComponentProps<typeof DrawerPrimitive.Root>) => (
   <DrawerPrimitive.Root shouldScaleBackground={shouldScaleBackground} {...props} />
@@ -43,6 +47,7 @@ const DrawerContent = React.forwardRef<
       )}
       {...props}
     >
+      {/* "Asa" visual que sugiere que el panel se puede arrastrar */}
       <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
       {children}
     </DrawerPrimitive.Content>

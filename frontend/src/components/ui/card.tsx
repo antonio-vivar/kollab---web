@@ -2,6 +2,13 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
+// Conjunto de piezas que, combinadas, forman una "tarjeta": un
+// contenedor con borde y sombra (Card), una zona de encabezado
+// (CardHeader) con título (CardTitle) y descripción (CardDescription)
+// opcional, un cuerpo (CardContent) y un pie (CardFooter). Cada pieza es
+// solo un <div> con clases predefinidas; se combinan según se necesite,
+// no es obligatorio usarlas todas.
+
 const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div

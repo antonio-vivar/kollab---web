@@ -3,6 +3,10 @@ import * as SeparatorPrimitive from "@radix-ui/react-separator";
 
 import { cn } from "@/lib/utils";
 
+// Línea divisoria entre secciones. "decorative=true" le indica a los
+// lectores de pantalla que es solo visual (no aporta información), para
+// que no la anuncien como contenido. Cambia de ancho/alto automático
+// según la orientación: horizontal (línea ancha y delgada) o vertical.
 const Separator = React.forwardRef<
   React.ElementRef<typeof SeparatorPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof SeparatorPrimitive.Root>

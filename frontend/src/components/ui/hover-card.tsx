@@ -3,6 +3,10 @@ import * as HoverCardPrimitive from "@radix-ui/react-hover-card";
 
 import { cn } from "@/lib/utils";
 
+// Similar al Popover, pero se abre al pasar el mouse sobre el trigger
+// (con un pequeño retraso) en vez de hacer clic — pensado para mostrar
+// una vista previa rápida (ej. info de un usuario al pasar sobre su
+// nombre), no para interacciones que requieran que el usuario haga clic.
 const HoverCard = HoverCardPrimitive.Root;
 
 const HoverCardTrigger = HoverCardPrimitive.Trigger;

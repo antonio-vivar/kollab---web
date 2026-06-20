@@ -5,6 +5,10 @@ import * as ProgressPrimitive from "@radix-ui/react-progress";
 
 import { cn } from "@/lib/utils";
 
+// Barra de progreso genérica de la librería. La pista de fondo es
+// siempre del 100% de ancho; lo que cambia es cuánto del "Indicator" se
+// ve, desplazándolo hacia la izquierda según el valor recibido (un
+// valor de 30 deja el indicador desplazado -70%, mostrando solo el 30%).
 const Progress = React.forwardRef<
   React.ElementRef<typeof ProgressPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>

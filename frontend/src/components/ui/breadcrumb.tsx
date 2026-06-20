@@ -4,6 +4,10 @@ import { ChevronRight, MoreHorizontal } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
+// Migas de pan: la fila "Inicio > Proyectos > Detalle" que indica en
+// qué parte de la navegación está el usuario. No la usa Kollab
+// actualmente (la navegación es por pestañas, no por jerarquía de
+// páginas), pero queda disponible en la librería de componentes.
 const Breadcrumb = React.forwardRef<
   HTMLElement,
   React.ComponentPropsWithoutRef<"nav"> & {
@@ -51,6 +55,8 @@ const BreadcrumbLink = React.forwardRef<
 });
 BreadcrumbLink.displayName = "BreadcrumbLink";
 
+// El último elemento de la ruta (la página actual): no es un enlace
+// clicable, por eso usa aria-disabled/aria-current en vez de <a>.
 const BreadcrumbPage = React.forwardRef<HTMLSpanElement, React.ComponentPropsWithoutRef<"span">>(
   ({ className, ...props }, ref) => (
     <span
@@ -65,6 +71,8 @@ const BreadcrumbPage = React.forwardRef<HTMLSpanElement, React.ComponentPropsWit
 );
 BreadcrumbPage.displayName = "BreadcrumbPage";
 
+// Separador entre cada nivel ("Inicio / Proyectos / ..."); por defecto
+// es una flecha, pero se puede reemplazar pasando otro elemento como hijo.
 const BreadcrumbSeparator = ({ children, className, ...props }: React.ComponentProps<"li">) => (
   <li
     role="presentation"
@@ -77,6 +85,8 @@ const BreadcrumbSeparator = ({ children, className, ...props }: React.ComponentP
 );
 BreadcrumbSeparator.displayName = "BreadcrumbSeparator";
 
+// Indicador de "..." cuando la ruta es muy larga y se colapsan niveles
+// intermedios para no saturar la pantalla.
 const BreadcrumbEllipsis = ({ className, ...props }: React.ComponentProps<"span">) => (
   <span
     role="presentation"

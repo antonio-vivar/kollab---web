@@ -4,6 +4,10 @@ import { Circle } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
+// Grupo de opciones donde solo una puede estar seleccionada a la vez.
+// "RadioGroup" es el contenedor que coordina la selección entre todos
+// sus "RadioGroupItem" hijos; el punto relleno (Circle) solo se ve en
+// el item que está marcado.
 const RadioGroup = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>

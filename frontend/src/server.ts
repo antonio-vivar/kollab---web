@@ -3,10 +3,16 @@ import "./lib/error-capture";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 
+// Forma mínima del manejador de peticiones que expone TanStack Start
+// para el render del lado servidor (SSR): recibe la petición HTTP y
+// devuelve una respuesta.
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
 };
 
+// El módulo real de TanStack Start se importa de forma diferida (solo la
+// primera vez que se necesita) y se reutiliza en las siguientes
+// peticiones, en vez de volver a importarlo cada vez.
 let serverEntryPromise: Promise<ServerEntry> | undefined;
 
 async function getServerEntry(): Promise<ServerEntry> {
@@ -20,14 +26,17 @@ async function getServerEntry(): Promise<ServerEntry> {
 
 // h3 swallows in-handler throws into a normal 500 Response with body
 // {"unhandled":true,"message":"HTTPError"} — try/catch alone never fires for those.
+// Esta función detecta ese caso particular (un error 500 "genérico" en
+// formato JSON) y lo reemplaza por una página de error legible para el
+// usuario, recuperando el error real capturado en error-capture.ts.
 async function normalizeCatastrophicSsrResponse(response: Response): Promise<Response> {
-  if (response.status < 500) return response;
+  if (response.status < 500) return response; // no es un error de servidor: se deja pasar tal cual
   const contentType = response.headers.get("content-type") ?? "";
   if (!contentType.includes("application/json")) return response;
 
   const body = await response.clone().text();
   if (!body.includes('"unhandled":true') || !body.includes('"message":"HTTPError"')) {
-    return response;
+    return response; // no coincide con la firma del error "tragado" por h3
   }
 
   console.error(consumeLastCapturedError() ?? new Error(`h3 swallowed SSR error: ${body}`));
@@ -37,6 +46,8 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
   });
 }
 
+// Punto de entrada que usa el entorno de despliegue (ej. Cloudflare
+// Workers) para procesar cada petición HTTP que llega al servidor.
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
@@ -44,6 +55,8 @@ export default {
       const response = await handler.fetch(request, env, ctx);
       return await normalizeCatastrophicSsrResponse(response);
     } catch (error) {
+      // Cualquier error no controlado durante el SSR también termina
+      // mostrando la página de error genérica, en vez de romper la petición.
       console.error(error);
       return new Response(renderErrorPage(), {
         status: 500,

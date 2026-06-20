@@ -2,6 +2,9 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
+// Igual que Input, pero para el <textarea> nativo: mismo estilo visual
+// (bordes, foco, placeholder), con una altura mínima en vez de fija para
+// que el usuario pueda escribir varias líneas.
 const Textarea = React.forwardRef<HTMLTextAreaElement, React.ComponentProps<"textarea">>(
   ({ className, ...props }, ref) => {
     return (

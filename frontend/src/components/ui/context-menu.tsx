@@ -4,6 +4,9 @@ import { Check, ChevronRight, Circle } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
+// Menú que aparece al hacer clic derecho (similar en estructura al
+// DropdownMenu, pero activado por el evento "contextmenu" del navegador
+// en vez de un clic normal). No se usa en Kollab actualmente.
 const ContextMenu = ContextMenuPrimitive.Root;
 
 const ContextMenuTrigger = ContextMenuPrimitive.Trigger;
@@ -12,14 +15,16 @@ const ContextMenuGroup = ContextMenuPrimitive.Group;
 
 const ContextMenuPortal = ContextMenuPrimitive.Portal;
 
-const ContextMenuSub = ContextMenuPrimitive.Sub;
+const ContextMenuSub = ContextMenuPrimitive.Sub; // submenú anidado
 
 const ContextMenuRadioGroup = ContextMenuPrimitive.RadioGroup;
 
+// Item que, al pasar el mouse, abre un submenú hacia la derecha (de ahí
+// la flecha ChevronRight).
 const ContextMenuSubTrigger = React.forwardRef<
   React.ElementRef<typeof ContextMenuPrimitive.SubTrigger>,
   React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.SubTrigger> & {
-    inset?: boolean;
+    inset?: boolean; // agrega sangría extra, para alinear con items que sí tienen un ícono a la izquierda
   }
 >(({ className, inset, children, ...props }, ref) => (
   <ContextMenuPrimitive.SubTrigger
@@ -87,6 +92,8 @@ const ContextMenuItem = React.forwardRef<
 ));
 ContextMenuItem.displayName = ContextMenuPrimitive.Item.displayName;
 
+// Item de menú con casilla de verificación incorporada (marca/desmarca
+// una opción sin cerrar el menú).
 const ContextMenuCheckboxItem = React.forwardRef<
   React.ElementRef<typeof ContextMenuPrimitive.CheckboxItem>,
   React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.CheckboxItem>
@@ -110,6 +117,8 @@ const ContextMenuCheckboxItem = React.forwardRef<
 ));
 ContextMenuCheckboxItem.displayName = ContextMenuPrimitive.CheckboxItem.displayName;
 
+// Item de menú tipo "radio" (selección única dentro de un grupo, marcada
+// con un punto relleno en vez de un check).
 const ContextMenuRadioItem = React.forwardRef<
   React.ElementRef<typeof ContextMenuPrimitive.RadioItem>,
   React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.RadioItem>
@@ -158,6 +167,7 @@ const ContextMenuSeparator = React.forwardRef<
 ));
 ContextMenuSeparator.displayName = ContextMenuPrimitive.Separator.displayName;
 
+// Texto pequeño a la derecha de un item (ej. el atajo de teclado de esa acción).
 const ContextMenuShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => {
   return (
     <span

@@ -2,6 +2,11 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
+// Conjunto de piezas para construir una tabla HTML con estilo
+// consistente (encabezado, filas con hover, celdas, pie y descripción).
+// Kollab no usa tablas en su interfaz actual (las listas de proyectos y
+// tareas se muestran como tarjetas), pero el componente queda disponible.
+
 const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(
   ({ className, ...props }, ref) => (
     <div className="relative w-full overflow-auto">

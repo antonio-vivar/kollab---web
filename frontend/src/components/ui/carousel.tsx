@@ -5,6 +5,13 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
+// Carrusel de slides deslizables, construido sobre la librería "embla".
+// No se usa en Kollab actualmente. El patrón general: un Context
+// (CarouselContext) comparte el estado del carrusel —si puede avanzar/
+// retroceder, hacia dónde se desplaza— entre Carousel y sus piezas
+// internas (Content, Item, Previous, Next), sin que cada una necesite
+// recibir esas props manualmente.
+
 type CarouselApi = UseEmblaCarouselType[1];
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>;
 type CarouselOptions = UseCarouselParameters[0];
@@ -14,7 +21,7 @@ type CarouselProps = {
   opts?: CarouselOptions;
   plugins?: CarouselPlugin;
   orientation?: "horizontal" | "vertical";
-  setApi?: (api: CarouselApi) => void;
+  setApi?: (api: CarouselApi) => void; // permite al padre obtener la instancia y controlarla externamente
 };
 
 type CarouselContextProps = {
@@ -28,6 +35,8 @@ type CarouselContextProps = {
 
 const CarouselContext = React.createContext<CarouselContextProps | null>(null);
 
+// Lee el contexto del carrusel; lanza un error claro si se usa fuera de
+// <Carousel>, en vez de fallar silenciosamente con un valor undefined.
 function useCarousel() {
   const context = React.useContext(CarouselContext);
 
@@ -52,6 +61,8 @@ const Carousel = React.forwardRef<
   const [canScrollPrev, setCanScrollPrev] = React.useState(false);
   const [canScrollNext, setCanScrollNext] = React.useState(false);
 
+  // Se ejecuta cada vez que cambia el slide visible, para actualizar si
+  // los botones de anterior/siguiente deben estar habilitados.
   const onSelect = React.useCallback((api: CarouselApi) => {
     if (!api) {
       return;
@@ -69,6 +80,7 @@ const Carousel = React.forwardRef<
     api?.scrollNext();
   }, [api]);
 
+  // Permite navegar el carrusel con las flechas del teclado cuando tiene foco.
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
       if (event.key === "ArrowLeft") {
@@ -82,6 +94,8 @@ const Carousel = React.forwardRef<
     [scrollPrev, scrollNext],
   );
 
+  // Si el componente padre pasó "setApi", le entrega la instancia de
+  // embla para que pueda controlar el carrusel desde afuera.
   React.useEffect(() => {
     if (!api || !setApi) {
       return;
@@ -90,6 +104,8 @@ const Carousel = React.forwardRef<
     setApi(api);
   }, [api, setApi]);
 
+  // Se suscribe a los eventos de embla para mantener sincronizado el
+  // estado de los botones prev/next con el slide realmente visible.
   React.useEffect(() => {
     if (!api) {
       return;
@@ -132,6 +148,8 @@ const Carousel = React.forwardRef<
 });
 Carousel.displayName = "Carousel";
 
+// "carouselRef" se conecta directamente al elemento que embla observa
+// para detectar el ancho disponible y calcular el desplazamiento.
 const CarouselContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {
     const { carouselRef, orientation } = useCarousel();
@@ -153,6 +171,7 @@ const CarouselContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HT
 );
 CarouselContent.displayName = "CarouselContent";
 
+// Cada slide individual del carrusel.
 const CarouselItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {
     const { orientation } = useCarousel();
@@ -174,6 +193,8 @@ const CarouselItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLD
 );
 CarouselItem.displayName = "CarouselItem";
 
+// Botón de slide anterior: se deshabilita automáticamente cuando ya no
+// se puede retroceder más (ej. en el primer slide).
 const CarouselPrevious = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof Button>>(
   ({ className, variant = "outline", size = "icon", ...props }, ref) => {
     const { orientation, scrollPrev, canScrollPrev } = useCarousel();

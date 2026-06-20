@@ -2,6 +2,10 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
+// Envoltorio estilizado sobre el <input> nativo del HTML. No agrega
+// comportamiento nuevo (sigue siendo un input normal de React), solo
+// aplica un conjunto de clases de Tailwind consistente con el resto del
+// sistema de diseño (shadcn/ui).
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
   ({ className, type, ...props }, ref) => {
     return (

@@ -3,6 +3,11 @@ import * as TabsPrimitive from "@radix-ui/react-tabs";
 
 import { cn } from "@/lib/utils";
 
+// Sistema de pestañas genérico de la librería (distinto de la
+// navegación por pestañas escrita a mano en routes/index.tsx, que usa
+// botones simples en vez de este componente). "TabsList" es la fila de
+// botones, "TabsTrigger" cada botón individual, y "TabsContent" el
+// panel asociado a cada pestaña.
 const Tabs = TabsPrimitive.Root;
 
 const TabsList = React.forwardRef<

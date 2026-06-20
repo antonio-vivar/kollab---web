@@ -11,6 +11,10 @@ import { getServerConfig } from "../config.server";
 // them in a .server.ts file. Use this pattern instead of Supabase Edge
 // Functions for server logic.
 
+// Función de ejemplo del template de TanStack Start, no usada por la
+// lógica de Kollab. "z.object({...})" valida que el dato recibido tenga
+// la forma esperada antes de ejecutar el handler (si no, lanza un error
+// de validación en vez de procesar datos incorrectos).
 export const getGreeting = createServerFn({ method: "POST" })
   .inputValidator(z.object({ name: z.string().min(1) }))
   .handler(async ({ data }) => {

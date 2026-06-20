@@ -3,6 +3,9 @@ import * as SwitchPrimitives from "@radix-ui/react-switch";
 
 import { cn } from "@/lib/utils";
 
+// Interruptor on/off estilo "pastilla". El "Thumb" (la perilla circular)
+// se desliza con translate-x según el atributo data-[state] que aplica
+// Radix automáticamente al activar/desactivar el switch.
 const Switch = React.forwardRef<
   React.ElementRef<typeof SwitchPrimitives.Root>,
   React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>

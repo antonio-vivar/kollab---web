@@ -1,3 +1,8 @@
+// Genera el HTML completo de una página de error genérica, usada como
+// último recurso cuando algo falla en el servidor antes de que React
+// llegue a renderizar nada (por eso es HTML escrito a mano, no un
+// componente de React: en ese punto React mismo podría no estar
+// disponible para renderizar).
 export function renderErrorPage(): string {
   return `<!doctype html>
 <html lang="en">

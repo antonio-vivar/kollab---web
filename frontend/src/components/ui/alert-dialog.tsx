@@ -4,6 +4,11 @@ import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 
+// Modal de confirmación que SIEMPRE exige una respuesta explícita (no se
+// puede cerrar haciendo clic afuera ni con Escape, a diferencia de
+// Dialog): pensado para acciones irreversibles, como "¿seguro que quieres
+// eliminar este proyecto?". Reutiliza buttonVariants de Button para que
+// "Action" y "Cancel" luzcan como botones reales del sistema de diseño.
 const AlertDialog = AlertDialogPrimitive.Root;
 
 const AlertDialogTrigger = AlertDialogPrimitive.Trigger;
@@ -80,6 +85,8 @@ const AlertDialogDescription = React.forwardRef<
 ));
 AlertDialogDescription.displayName = AlertDialogPrimitive.Description.displayName;
 
+// Botón de confirmar la acción ("sí, eliminar"): toma el estilo del
+// botón "default" de Button.
 const AlertDialogAction = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Action>,
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Action>
@@ -88,6 +95,8 @@ const AlertDialogAction = React.forwardRef<
 ));
 AlertDialogAction.displayName = AlertDialogPrimitive.Action.displayName;
 
+// Botón de cancelar: toma el estilo "outline" de Button, para que se
+// distinga visualmente del botón de confirmar.
 const AlertDialogCancel = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Cancel>,
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Cancel>

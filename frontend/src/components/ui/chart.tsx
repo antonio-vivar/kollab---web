@@ -3,9 +3,18 @@ import * as RechartsPrimitive from "recharts";
 
 import { cn } from "@/lib/utils";
 
-// Format: { THEME_NAME: CSS_SELECTOR }
+// Capa de estilo sobre la librería "Recharts" para construir gráficos
+// (de barras, líneas, etc.) consistentes con el sistema de diseño.
+// Kollab NO usa gráficos de Recharts: las barras de progreso y de carga
+// laboral del dashboard están hechas a mano con <div> y CSS (ver
+// progressOf/WorkloadView en routes/index.tsx), no con esta librería.
+
+// Define los selectores CSS que activan cada tema (claro/oscuro) al
+// generar los estilos de color del gráfico más abajo.
 const THEMES = { light: "", dark: ".dark" } as const;
 
+// Configuración de un gráfico: por cada serie de datos, su etiqueta,
+// ícono opcional y color — ya sea un color fijo o uno distinto por tema.
 export type ChartConfig = {
   [k in string]: {
     label?: React.ReactNode;
@@ -20,6 +29,9 @@ type ChartContextProps = {
   config: ChartConfig;
 };
 
+// Comparte la configuración del gráfico (colores, etiquetas) con los
+// subcomponentes de tooltip y leyenda, sin tener que pasarla por props
+// en cada uno.
 const ChartContext = React.createContext<ChartContextProps | null>(null);
 
 function useChart() {
@@ -32,6 +44,9 @@ function useChart() {
   return context;
 }
 
+// Contenedor principal: envuelve el gráfico de Recharts dentro de un
+// "ResponsiveContainer" (se adapta al ancho disponible) y genera un id
+// único para poder aplicarle estilos de color específicos vía ChartStyle.
 const ChartContainer = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
@@ -48,6 +63,9 @@ const ChartContainer = React.forwardRef<
         data-chart={chartId}
         ref={ref}
         className={cn(
+          // Selectores largos que sobrescriben los colores por defecto
+          // que Recharts aplica a sus elementos internos (ejes, grillas,
+          // tooltips), para que combinen con la paleta de la app.
           "flex aspect-video justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none",
           className,
         )}
@@ -61,6 +79,10 @@ const ChartContainer = React.forwardRef<
 });
 ChartContainer.displayName = "Chart";
 
+// Genera, en tiempo de ejecución, un bloque <style> con variables CSS
+// (--color-NOMBRE) para cada serie del gráfico, una por tema (claro/
+// oscuro). Es la forma de inyectar colores dinámicos definidos en
+// ChartConfig sin tener que escribirlos como clases de Tailwind fijas.
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(([, config]) => config.theme || config.color);
 
@@ -92,6 +114,9 @@ ${colorConfig
 
 const ChartTooltip = RechartsPrimitive.Tooltip;
 
+// Tooltip personalizado que se muestra al pasar el mouse sobre un punto
+// del gráfico: toma los datos crudos que entrega Recharts ("payload") y
+// los formatea usando las etiquetas/colores definidos en ChartConfig.
 const ChartTooltipContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
@@ -123,6 +148,9 @@ const ChartTooltipContent = React.forwardRef<
   ) => {
     const { config } = useChart();
 
+    // Calcula el título del tooltip (ej. el nombre del eje X del punto
+    // sobre el que está el mouse), reutilizando la etiqueta configurada
+    // en ChartConfig si existe, o el label crudo de Recharts si no.
     const tooltipLabel = React.useMemo(() => {
       if (hideLabel || !payload?.length) {
         return null;
@@ -150,7 +178,7 @@ const ChartTooltipContent = React.forwardRef<
     }, [label, labelFormatter, payload, hideLabel, labelClassName, config, labelKey]);
 
     if (!active || !payload?.length) {
-      return null;
+      return null; // no hay nada que mostrar si el mouse no está sobre el gráfico
     }
 
     const nestLabel = payload.length === 1 && indicator !== "dot";
@@ -165,6 +193,7 @@ const ChartTooltipContent = React.forwardRef<
       >
         {!nestLabel ? tooltipLabel : null}
         <div className="grid gap-1.5">
+          {/* Una fila por cada serie de datos en el punto actual del gráfico */}
           {payload
             .filter((item) => item.type !== "none")
             .map((item, index) => {
@@ -188,6 +217,8 @@ const ChartTooltipContent = React.forwardRef<
                         <itemConfig.icon />
                       ) : (
                         !hideIndicator && (
+                          // Pequeño indicador de color: punto, línea o
+                          // línea punteada, según la prop "indicator".
                           <div
                             className={cn(
                               "shrink-0 rounded-[2px] border-(--color-border) bg-(--color-bg)",
@@ -240,6 +271,9 @@ ChartTooltipContent.displayName = "ChartTooltip";
 
 const ChartLegend = RechartsPrimitive.Legend;
 
+// Leyenda personalizada del gráfico (la fila de "● Serie A  ● Serie B"
+// debajo o encima del gráfico), reutilizando los mismos colores e
+// iconos definidos en ChartConfig.
 const ChartLegendContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> &
@@ -295,7 +329,10 @@ const ChartLegendContent = React.forwardRef<
 });
 ChartLegendContent.displayName = "ChartLegend";
 
-// Helper to extract item config from a payload.
+// Busca, dentro de ChartConfig, la configuración (etiqueta/color/ícono)
+// que corresponde a un punto de datos específico del gráfico, revisando
+// tanto el dato directo como el objeto "payload" anidado que a veces
+// entrega Recharts.
 function getPayloadConfigFromPayload(config: ChartConfig, payload: unknown, key: string) {
   if (typeof payload !== "object" || payload === null) {
     return undefined;

@@ -4,6 +4,10 @@ import { ChevronDown } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
+// Lista de secciones plegables, donde cada "AccordionItem" se puede
+// expandir/contraer haciendo clic en su "AccordionTrigger". La flecha
+// gira 180° automáticamente cuando la sección está abierta, gracias al
+// selector "[data-state=open]>svg".
 const Accordion = AccordionPrimitive.Root;
 
 const AccordionItem = React.forwardRef<

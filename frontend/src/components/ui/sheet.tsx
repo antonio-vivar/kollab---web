@@ -7,6 +7,10 @@ import { X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
+// Panel que se desliza desde un borde de la pantalla (arriba, abajo,
+// izquierda o derecha), construido sobre el mismo Dialog de Radix que
+// usa dialog.tsx. Es ideal para menús laterales o paneles de detalle en
+// móvil, donde un modal centrado se sentiría menos natural.
 const Sheet = SheetPrimitive.Root;
 
 const SheetTrigger = SheetPrimitive.Trigger;
@@ -30,6 +34,8 @@ const SheetOverlay = React.forwardRef<
 ));
 SheetOverlay.displayName = SheetPrimitive.Overlay.displayName;
 
+// Define, por cada lado posible ("top", "bottom", "left", "right"), de
+// dónde entra y sale el panel y cuánto espacio ocupa.
 const sheetVariants = cva(
   "fixed z-50 gap-4 bg-background p-6 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out",
   {

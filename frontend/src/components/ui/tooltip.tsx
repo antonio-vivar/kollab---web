@@ -5,6 +5,13 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 
 import { cn } from "@/lib/utils";
 
+// Globo de texto que aparece al pasar el mouse sobre un elemento.
+// "TooltipProvider" debe envolver la parte de la app donde se usen
+// tooltips (controla el delay compartido entre todos); "Tooltip" es la
+// instancia individual, "TooltipTrigger" el elemento que lo activa al
+// pasar el mouse, y "TooltipContent" el contenido del globo (renderizado
+// en un Portal, fuera del flujo normal del DOM, para evitar que quede
+// recortado por contenedores con overflow:hidden).
 const TooltipProvider = TooltipPrimitive.Provider;
 
 const Tooltip = TooltipPrimitive.Root;

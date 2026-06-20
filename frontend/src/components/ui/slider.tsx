@@ -3,6 +3,9 @@ import * as SliderPrimitive from "@radix-ui/react-slider";
 
 import { cn } from "@/lib/utils";
 
+// Control deslizante (slider) de un valor numérico dentro de un rango.
+// "Track" es la línea completa, "Range" es la porción ya recorrida
+// (resaltada), y "Thumb" es la perilla que el usuario arrastra.
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>

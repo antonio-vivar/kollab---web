@@ -6,6 +6,10 @@ import { Check, ChevronRight, Circle } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
+// Menú desplegable que se abre al hacer clic en un botón (distinto del
+// selector de "responsable" de Kollab, que usa un <select> nativo en
+// vez de este componente). Misma estructura que ContextMenu, pero
+// activado por clic normal en vez de clic derecho.
 const DropdownMenu = DropdownMenuPrimitive.Root;
 
 const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;

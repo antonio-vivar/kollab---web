@@ -7,11 +7,16 @@ import { type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { toggleVariants } from "@/components/ui/toggle";
 
+// Contexto que permite definir "variant"/"size" una sola vez en el
+// <ToggleGroup> padre y que todos sus <ToggleGroupItem> hijos lo hereden
+// automáticamente, sin tener que repetir las mismas props en cada uno.
 const ToggleGroupContext = React.createContext<VariantProps<typeof toggleVariants>>({
   size: "default",
   variant: "default",
 });
 
+// Grupo de botones tipo Toggle que se comportan como un conjunto (puede
+// permitir selección única o múltiple, según la prop "type" de Radix).
 const ToggleGroup = React.forwardRef<
   React.ElementRef<typeof ToggleGroupPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof ToggleGroupPrimitive.Root> &
@@ -28,6 +33,8 @@ const ToggleGroup = React.forwardRef<
 
 ToggleGroup.displayName = ToggleGroupPrimitive.Root.displayName;
 
+// Cada botón individual del grupo. Si no recibe su propio variant/size,
+// usa el que definió el ToggleGroup padre a través del contexto.
 const ToggleGroupItem = React.forwardRef<
   React.ElementRef<typeof ToggleGroupPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof ToggleGroupPrimitive.Item> &

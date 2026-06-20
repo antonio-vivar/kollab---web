@@ -3,6 +3,10 @@ import { Group, Panel, Separator } from "react-resizable-panels";
 
 import { cn } from "@/lib/utils";
 
+// Paneles redimensionables arrastrando una barra divisoria (ej. un
+// explorador de archivos a la izquierda y el contenido a la derecha,
+// donde el usuario puede ajustar cuánto espacio ocupa cada uno). No se
+// usa en Kollab actualmente.
 const ResizablePanelGroup = ({ className, ...props }: React.ComponentProps<typeof Group>) => (
   <Group
     className={cn("flex h-full w-full data-[panel-group-direction=vertical]:flex-col", className)}
@@ -12,6 +16,8 @@ const ResizablePanelGroup = ({ className, ...props }: React.ComponentProps<typeo
 
 const ResizablePanel = Panel;
 
+// La barra divisoria entre dos paneles. "withHandle" agrega un pequeño
+// icono central (como un "asa" visual) para indicar que se puede arrastrar.
 const ResizableHandle = ({
   withHandle,
   className,

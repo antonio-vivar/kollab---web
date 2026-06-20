@@ -16,6 +16,9 @@ import process from "node:process";
 //     and server (analytics IDs, public URLs). Define in .env with the
 //     VITE_ prefix. Never put secrets here — they ship to the browser.
 
+// En este proyecto no se usan variables de entorno propias del backend
+// (no hay base de datos ni claves secretas que proteger): la función
+// solo expone el modo de ejecución (development/production) de Node.
 export function getServerConfig() {
   return {
     nodeEnv: process.env.NODE_ENV,

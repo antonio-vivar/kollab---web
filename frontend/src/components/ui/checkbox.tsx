@@ -4,6 +4,10 @@ import { Check } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
+// Casilla de verificación accesible (basada en Radix UI). El ícono de
+// "check" solo se muestra cuando el estado interno es "checked"
+// (controlado por CheckboxPrimitive.Indicator, que Radix oculta/muestra
+// automáticamente según data-[state]).
 const Checkbox = React.forwardRef<
   React.ElementRef<typeof CheckboxPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>
