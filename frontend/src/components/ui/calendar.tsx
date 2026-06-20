@@ -7,6 +7,11 @@ import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
 
+// Selector de fecha tipo calendario completo, construido sobre la
+// librería "react-day-picker". No se usa en Kollab: las fechas de los
+// proyectos se muestran con formatDate() (routes/index.tsx) y no hay
+// ningún formulario que requiera elegir una fecha desde un calendario
+// visual en la versión actual del MVP.
 function Calendar({
   className,
   classNames,
@@ -21,6 +26,9 @@ function Calendar({
 }) {
   const defaultClassNames = getDefaultClassNames();
 
+  // Renderiza el componente DayPicker de la librería, sobrescribiendo
+  // sus clases por defecto (classNames) y algunas piezas visuales
+  // (components) para que combinen con el resto del sistema de diseño.
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
@@ -136,6 +144,9 @@ function Calendar({
   );
 }
 
+// Botón de cada día individual dentro del calendario; cambia de estilo
+// según si está seleccionado, es parte de un rango, o tiene el foco del
+// teclado (en cuyo caso se enfoca automáticamente vía ref).
 function CalendarDayButton({
   className,
   day,

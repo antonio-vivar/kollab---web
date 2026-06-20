@@ -5,8 +5,10 @@ import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 
+// Configuración de ESLint: reglas de calidad de código para TypeScript/
+// React (hooks, Fast Refresh) más Prettier para formato consistente.
 export default tseslint.config(
-  { ignores: ["dist", ".output", ".vinxi"] },
+  { ignores: ["dist", ".output", ".vinxi"] }, // carpetas de build que no se analizan
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],
@@ -20,6 +22,8 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      // Evita importar el paquete "server-only" de Next.js, que no aplica
+      // en este proyecto (usa TanStack Start, no Next.js).
       "no-restricted-imports": [
         "error",
         {
