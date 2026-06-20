@@ -24,8 +24,11 @@ async function getServerEntry(): Promise<ServerEntry> {
   return serverEntryPromise;
 }
 
-// h3 swallows in-handler throws into a normal 500 Response with body
-// {"unhandled":true,"message":"HTTPError"} — try/catch alone never fires for those.
+// h3 (el servidor HTTP interno que usa TanStack Start) "traga" los
+// errores lanzados dentro del handler y los convierte en una respuesta
+// 500 genérica con el cuerpo {"unhandled":true,"message":"HTTPError"} —
+// un try/catch normal nunca llega a capturar ese error porque ya fue
+// transformado en una respuesta válida antes de llegar aquí.
 // Esta función detecta ese caso particular (un error 500 "genérico" en
 // formato JSON) y lo reemplaza por una página de error legible para el
 // usuario, recuperando el error real capturado en error-capture.ts.
